@@ -13,6 +13,9 @@ from src.app.models import CheckoutRequest, Ticket, Task
 from src.app.tasks import create_stripe_session
 from src.app.celery import process_payment
 from src.app.db import AsyncSession as async_session, AsyncSessionLocal
+from src.app import settings
+
+import uvicorn
 
 app = FastAPI()
 
@@ -76,3 +79,11 @@ async def stripe_webhook(request: Request):
         process_payment.delay(session["id"])
 
     return {"message": "Webhook received"}
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "src.main:app",
+        host=settings.run.host,
+        port=settings.run.port,
+        reload=True
+    )
